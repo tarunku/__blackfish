@@ -1,0 +1,54 @@
+#
+# ROI-CDC
+#
+
+spark-submit \
+--name ROI_CDC_QA1EKS \
+--master yarn \
+--deploy-mode cluster \
+--num-executors 4 \
+--executor-memory 4g \
+--executor-cores 1 \
+--driver-memory 4g \
+--driver-cores 1 \
+--conf spark.default.parallelism=2 \
+--conf spark.driver.maxResultSize=3g \
+--conf spark.driver.memoryOverhead=1764m \
+--conf spark.executor.memoryOverhead=1764m \
+--conf spark.dynamicAllocation.enabled=false \
+--conf spark.sql.adaptive.enabled=true \
+--conf spark.jars=s3://**s3-bucket**/dependencies/emr_rs_connector/lib/RedshiftJDBC.jar,s3://**s3-bucket**/dependencies/emr_rs_connector/lib/minimal-json.jar,s3://**s3-bucket**/dependencies/emr_rs_connector/lib/spark-avro.jar,s3://**s3-bucket**/dependencies/emr_rs_connector/lib/spark-redshift.jar \
+--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.1,io.delta:delta-core_2.12:1.1.0 \
+--conf spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension \
+--conf spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog \
+--py-files roi_jobs/schema.py \
+_02_roi_cdc_streaming_app.py
+
+
+
+#
+# ROI-SF
+#
+spark-submit \
+--name ROI_SF_QA1EKS \
+--master yarn \
+--num-executors 4 \
+--executor-memory 10g \
+--executor-cores 4 \
+--driver-memory 10g \
+--driver-cores 4 \
+--conf spark.default.parallelism=4 \
+--conf spark.driver.maxResultSize=3g \
+--conf spark.driver.memoryOverhead=1764m \
+--conf spark.executor.memoryOverhead=1764m \
+--conf spark.dynamicAllocation.enabled=false \
+--conf spark.sql.adaptive.enabled=true \
+--conf spark.jars=s3://**s3-bucket**/dependencies/emr_rs_connector/lib/RedshiftJDBC.jar,s3://**s3-bucket**/dependencies/emr_rs_connector/lib/minimal-json.jar,s3://**s3-bucket**/dependencies/emr_rs_connector/lib/spark-avro.jar,s3://**s3-bucket**/dependencies/emr_rs_connector/lib/spark-redshift.jar \
+--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.1,io.delta:delta-core_2.12:1.1.0 \
+--conf spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension \
+--conf spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog \
+--py-files s3://**s3-bucket**/roi_dashboard/qaoneeks-perf/__executables/roi_jobs/schema.py \
+s3://**s3-bucket**/roi_dashboard/qaoneeks-perf/__executables/roi_jobs/_03_roi_sf_streaming_app.py
+
+
+
